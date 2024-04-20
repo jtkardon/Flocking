@@ -23,9 +23,11 @@ void AAgent::Init(UStaticMeshComponent* mesh, int id) {
 void AAgent::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	AFlockingGameModeBase* gmb = Cast<AFlockingGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	Velocity.Z = gmb->Speed;
-
+	//Velocity.Z = gmb->Speed;
 	FVector loc = GetActorLocation();
 	SetActorLocation(loc + Velocity);
 }
 
+void AAgent::setVelocity(FVector newVelocity) {
+	Velocity = newVelocity;
+}

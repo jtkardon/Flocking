@@ -1,24 +1,21 @@
-#include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "FlockingManager.h"
-#include "FlockingGameModeBase.generated.h"
+// Copyright Epic Games, Inc. All Rights Reserved.
 
-UCLASS()
-class FLOCKING_API AFlockingGameModeBase : public AGameModeBase
-{
-    GENERATED_BODY()
-    AFlockingGameModeBase();
 
-public:
-    UPROPERTY(EditAnywhere, meta = (ClampMin = "-10.0", ClampMax = "10.0"))
-    float Speed;
+#include "FlockingGameModeBase.h"
 
-private:
-    UPROPERTY(EditAnywhere)
-    class UStaticMeshComponent* AgentMesh;
+AFlockingGameModeBase::AFlockingGameModeBase() {
+    AgentMesh = CreateDefaultSubobject<UStaticMeshComponent>("AgentMesh");
+    PrimaryActorTick.bCanEverTick = true;
+}
 
-    UPROPERTY() UFlockingManager* Manager;
+void AFlockingGameModeBase::BeginPlay() {
+    Super::BeginPlay();
+    UE_LOG(LogTemp, Warning, TEXT("GAMEMODE BEGINPLAY()"));
+    Manager = NewObject<UFlockingManager>();
+    Manager->Init(GetWorld(), AgentMesh);
+}
 
-    virtual void BeginPlay() override;
-    virtual void Tick(float DeltaTime) override;
+void AFlockingGameModeBase::Tick(float DeltaTime) {
+    Super::Tick(DeltaTime);
+    Manager->Flock();
 };

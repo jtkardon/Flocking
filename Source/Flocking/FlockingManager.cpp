@@ -18,14 +18,34 @@ void UFlockingManager::Init(UWorld* world, UStaticMeshComponent* mesh) {
             FVector location = FVector();
             location.X = FMath::Sin(incr * i) * 150.f;
             location.Z = FMath::Cos(incr * i) * 150.f;
-
+         
             AAgent* agent = World->SpawnActor<AAgent>(location, rotation);
             agent->Init(mesh, i);
             Agents.Add(agent);
+            
         }
     }
 
     initialized = true;
 }
 
-void UFlockingManager::Flock() {}
+void UFlockingManager::Flock() {
+    //Rule 1
+
+    for (AAgent* agent : Agents) {
+        FVector centerOfMass = FVector(0.0f);
+        for (AAgent* otherAgent : Agents) {
+            if (agent != otherAgent) {
+                centerOfMass += otherAgent->GetActorLocation();
+            }
+        }
+
+        centerOfMass /= AGENT_COUNT - 1;
+        agent->setVelocity((centerOfMass - agent->GetActorLocation()) / 100);
+        UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), centerOfMass.X, centerOfMass.Y, centerOfMass.Z);
+    }
+ 
+
+    
+    //UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), centerOfMass.X, centerOfMass.Y, centerOfMass.Z);
+}

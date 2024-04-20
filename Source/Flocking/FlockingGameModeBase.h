@@ -10,18 +10,19 @@
 UCLASS()
 class FLOCKING_API AFlockingGameModeBase : public AGameModeBase
 {
-	GENERATED_BODY()
-	AFlockingGameModeBase();
-
-	UPROPERTY(EditAnywhere)
-	class UStaticMeshComponent* AgentMesh;
-
-	UPROPERTY() UFlockingManager* Manager;
-
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
+    GENERATED_BODY()
+    AFlockingGameModeBase();
 
 public:
-	UPROPERTY(EditAnywhere, meta = (ClampMin = "-20.0", ClampMax = "20.0"))
-	float Speed;
+    UPROPERTY(EditAnywhere, meta = (ClampMin = "-20.0", ClampMax = "20.0"))
+    float Speed;
+
+private:
+    UPROPERTY(EditAnywhere)
+    class UStaticMeshComponent* AgentMesh;
+
+    UPROPERTY() UFlockingManager* Manager;
+
+    virtual void BeginPlay() override;
+    virtual void Tick(float DeltaTime) override;
 };
