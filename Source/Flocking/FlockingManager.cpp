@@ -17,6 +17,7 @@ void UFlockingManager::Init(UWorld* world, UStaticMeshComponent* mesh) {
 
             FVector location = FVector();
             location.X = FMath::Sin(incr * i) * 150.f;
+            location.Y = FMath::Tan(incr * i) * 150.f;
             location.Z = FMath::Cos(incr * i) * 150.f;
          
             AAgent* agent = World->SpawnActor<AAgent>(location, rotation);
@@ -33,20 +34,28 @@ void UFlockingManager::Flock() {
     for (AAgent* agent : Agents) {
         FVector finalVelocity = agent->Velocity;
         //Rule 1
+        int count = 0;
         FVector centerOfMass = FVector(0.0f);
         for (AAgent* otherAgent : Agents) {
             if (agent != otherAgent) {
-                centerOfMass += otherAgent->GetActorLocation();
+                if (abs((agent->GetActorLocation() - otherAgent->GetActorLocation()).Size()) < 1000) {
+                    centerOfMass += otherAgent->GetActorLocation();
+                    count++;
+                }
             }
         }
-        centerOfMass /= AGENT_COUNT - 1;
+        if (count != 0) {
+            centerOfMass /= count;
+        }
         finalVelocity += (centerOfMass - agent->GetActorLocation()) / 100;
 
         //Rule 2
+        int index = 0;
         FVector distanceBetweenBoids = FVector(0.0f);
         for (AAgent* otherAgent : Agents) {
             if (agent != otherAgent) {
                 if (abs((agent->GetActorLocation() - otherAgent->GetActorLocation()).Size()) < 100) {
+                    index++;
                     distanceBetweenBoids -= (otherAgent->GetActorLocation() - agent->GetActorLocation());
                 }
             }
@@ -61,12 +70,14 @@ void UFlockingManager::Flock() {
                 otherBoidVelocities += otherAgent->Velocity;
             }
         }
-        otherBoidVelocities /= AGENT_COUNT - 1;
+        otherBoidVelocities /= (AGENT_COUNT - 1);
         finalVelocity += (distanceBetweenBoids - agent->Velocity) / 8;
 
         //End
         agent->setVelocity(finalVelocity);
-//        UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), agent->GetActorLocation().X, agent->GetActorLocation().Y, agent->GetActorLocation().Z);
+        FVector loc = agent->GetActorLocation();
+        agent->SetActorLocation(loc + finalVelocity);
+        UE_LOG(LogTemp, Warning, TEXT("index:%d, x:%f, y:%f, z:%f"), index, agent->Velocity.X, agent->Velocity.Y, agent->Velocity.Z);
     }
  
 
