@@ -30,22 +30,45 @@ void UFlockingManager::Init(UWorld* world, UStaticMeshComponent* mesh) {
 }
 
 void UFlockingManager::Flock() {
-    //Rule 1
-
     for (AAgent* agent : Agents) {
+        FVector finalVelocity = agent->Velocity;
+        //Rule 1
         FVector centerOfMass = FVector(0.0f);
         for (AAgent* otherAgent : Agents) {
             if (agent != otherAgent) {
                 centerOfMass += otherAgent->GetActorLocation();
             }
         }
-
         centerOfMass /= AGENT_COUNT - 1;
-        agent->setVelocity((centerOfMass - agent->GetActorLocation()) / 100);
-        UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), centerOfMass.X, centerOfMass.Y, centerOfMass.Z);
+        finalVelocity += (centerOfMass - agent->GetActorLocation()) / 100;
+
+        //Rule 2
+        FVector distanceBetweenBoids = FVector(0.0f);
+        for (AAgent* otherAgent : Agents) {
+            if (agent != otherAgent) {
+                if (abs((agent->GetActorLocation() - otherAgent->GetActorLocation()).Size()) < 100) {
+                    distanceBetweenBoids -= (otherAgent->GetActorLocation() - agent->GetActorLocation());
+                }
+            }
+        }
+        finalVelocity += distanceBetweenBoids;
+
+
+        //Rule 3
+        FVector otherBoidVelocities = FVector(0.0f);
+        for (AAgent* otherAgent : Agents) {
+            if (agent != otherAgent) {
+                otherBoidVelocities += otherAgent->Velocity;
+            }
+        }
+        otherBoidVelocities /= AGENT_COUNT - 1;
+        finalVelocity += (distanceBetweenBoids - agent->Velocity) / 8;
+
+        //End
+        agent->setVelocity(finalVelocity);
+//        UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), agent->GetActorLocation().X, agent->GetActorLocation().Y, agent->GetActorLocation().Z);
     }
  
 
     
-    //UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), centerOfMass.X, centerOfMass.Y, centerOfMass.Z);
 }
