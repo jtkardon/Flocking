@@ -17,6 +17,7 @@ public:
 	void Init(UStaticMeshComponent* mesh, int id);
 	UStaticMeshComponent* Mesh;
 	FVector Velocity;
+	FVector facingAngle;
 	void setVelocity(FVector newVelocity);
 
 protected:

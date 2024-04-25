@@ -56,7 +56,8 @@ void UFlockingManager::Flock() {
             if (agent != otherAgent) {
                 if (abs((agent->GetActorLocation() - otherAgent->GetActorLocation()).Size()) < 100) {
                     index++;
-                    distanceBetweenBoids -= (otherAgent->GetActorLocation() - agent->GetActorLocation());
+                    UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), (otherAgent->GetActorLocation() - agent->GetActorLocation()).X, (otherAgent->GetActorLocation() - agent->GetActorLocation()).Y, (otherAgent->GetActorLocation() - agent->GetActorLocation()).Z);
+                    distanceBetweenBoids -= (otherAgent->GetActorLocation() - agent->GetActorLocation()) / 2;
                 }
             }
         }
@@ -74,10 +75,10 @@ void UFlockingManager::Flock() {
         finalVelocity += (distanceBetweenBoids - agent->Velocity) / 8;
 
         //End
-        agent->setVelocity(finalVelocity);
+        //agent->setVelocity(finalVelocity);
         FVector loc = agent->GetActorLocation();
         agent->SetActorLocation(loc + finalVelocity);
-        UE_LOG(LogTemp, Warning, TEXT("index:%d, x:%f, y:%f, z:%f"), index, agent->Velocity.X, agent->Velocity.Y, agent->Velocity.Z);
+        //UE_LOG(LogTemp, Warning, TEXT("index:%d, x:%f, y:%f, z:%f"), index, agent->Velocity.X, agent->Velocity.Y, agent->Velocity.Z);
     }
  
 
