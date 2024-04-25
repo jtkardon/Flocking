@@ -14,7 +14,7 @@ class FLOCKING_API AFlockingGameModeBase : public AGameModeBase
     AFlockingGameModeBase();
 
 public:
-    UPROPERTY(EditAnywhere, meta = (ClampMin = "-20.0", ClampMax = "20.0"))
+    UPROPERTY(EditAnywhere, meta = (ClampMin = "0.0", ClampMax = "20.0"))
     float Speed;
 
 private:

@@ -9,6 +9,7 @@ AAgent::AAgent() {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AgentMesh"));
 	RootComponent = Mesh;
 	Velocity = FVector(0.f);
+	
 }
 
 void AAgent::BeginPlay() {
@@ -18,12 +19,16 @@ void AAgent::BeginPlay() {
 void AAgent::Init(UStaticMeshComponent* mesh, int id) {
 	UE_LOG(LogTemp, Warning, TEXT("Agent initialized."));
 	Mesh->SetStaticMesh(mesh->GetStaticMesh());
+	direction = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+	direction.Normalize();
 }
 
 void AAgent::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 	AFlockingGameModeBase* gmb = Cast<AFlockingGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
-	Velocity.Z += gmb->Speed;
+	direction.Normalize();
+	Velocity = direction * gmb->Speed;
+
 
 }
 

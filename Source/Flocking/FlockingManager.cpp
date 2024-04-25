@@ -2,6 +2,8 @@
 
 #include "FlockingManager.h"
 #include "Agent.h"
+#include "FlockingGameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 #define AGENT_COUNT 10    
 
@@ -47,17 +49,16 @@ void UFlockingManager::Flock() {
         if (count != 0) {
             centerOfMass /= count;
         }
-        finalVelocity += (centerOfMass - agent->GetActorLocation()) / 100;
+        finalVelocity += (centerOfMass - agent->GetActorLocation()) / 1000;
 
         //Rule 2
         int index = 0;
         FVector distanceBetweenBoids = FVector(0.0f);
         for (AAgent* otherAgent : Agents) {
             if (agent != otherAgent) {
-                if (abs((agent->GetActorLocation() - otherAgent->GetActorLocation()).Size()) < 100) {
+                if (abs((agent->GetActorLocation() - otherAgent->GetActorLocation()).Size()) < 200) {
                     index++;
-                    UE_LOG(LogTemp, Warning, TEXT("x:%f, y:%f, z:%f"), (otherAgent->GetActorLocation() - agent->GetActorLocation()).X, (otherAgent->GetActorLocation() - agent->GetActorLocation()).Y, (otherAgent->GetActorLocation() - agent->GetActorLocation()).Z);
-                    distanceBetweenBoids -= (otherAgent->GetActorLocation() - agent->GetActorLocation()) / 2;
+                    distanceBetweenBoids -= (otherAgent->GetActorLocation() - agent->GetActorLocation()) / 3;
                 }
             }
         }
@@ -72,10 +73,37 @@ void UFlockingManager::Flock() {
             }
         }
         otherBoidVelocities /= (AGENT_COUNT - 1);
-        finalVelocity += (distanceBetweenBoids - agent->Velocity) / 8;
+        finalVelocity += (otherBoidVelocities - agent->Velocity) / 8;
+
+        //Stay in Bounding Box
+        FVector distanceFromBox = FVector(0.0f);
+        if (agent->GetActorLocation().X > 950) {
+            distanceFromBox.X = -25;
+        }
+        else if ((agent->GetActorLocation().X < -950)) {
+            distanceFromBox.X = 25;
+        }
+        if (agent->GetActorLocation().Y > 950) {
+            distanceFromBox.Y = -25;
+        }
+        else if ((agent->GetActorLocation().Y < -950)) {
+            distanceFromBox.Y = 25;
+        }
+        if (agent->GetActorLocation().Z > 950) {
+            distanceFromBox.Z = -25;
+        }
+        else if ((agent->GetActorLocation().Z < -950)) {
+            distanceFromBox.Z = 25;
+        }
+
+        finalVelocity += distanceFromBox;
 
         //End
         //agent->setVelocity(finalVelocity);
+        agent->direction = finalVelocity;
+        AFlockingGameModeBase* gmb = Cast<AFlockingGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+        //direction.Normalize();
+        //Velocity = direction * gmb->Speed;
         FVector loc = agent->GetActorLocation();
         agent->SetActorLocation(loc + finalVelocity);
         //UE_LOG(LogTemp, Warning, TEXT("index:%d, x:%f, y:%f, z:%f"), index, agent->Velocity.X, agent->Velocity.Y, agent->Velocity.Z);
