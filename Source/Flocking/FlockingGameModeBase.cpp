@@ -6,6 +6,7 @@
 AFlockingGameModeBase::AFlockingGameModeBase() {
     AgentMesh = CreateDefaultSubobject<UStaticMeshComponent>("AgentMesh");
     PrimaryActorTick.bCanEverTick = true;
+    Speed = 17.f;
 }
 
 void AFlockingGameModeBase::BeginPlay() {
